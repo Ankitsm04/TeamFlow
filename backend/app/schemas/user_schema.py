@@ -8,11 +8,8 @@ class UserCreate(BaseModel):
     password: str
 
 class UserResponse(BaseModel):
-    id: UUID
+    message: str
     email: EmailStr
-    is_verified: bool
-    provider: str
-    created_at: datetime
 
     class Config:
         from_attributes = True
