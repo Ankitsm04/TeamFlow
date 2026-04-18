@@ -7,6 +7,7 @@ from app.core.security import hash_password, verify_password, create_access_toke
 from app.utils.otp_utils import generate_otp, hash_otp
 from app.utils.email_service import send_otp_email
 from fastapi import HTTPException
+from app.models.workspace import Workspace
 
 def register_user(db: Session, user: UserCreate):
     existing_user = db.query(User).filter(User.email == user.email).first()
@@ -82,6 +83,17 @@ def verify_user_otp(db: Session, email: str, otp: str):
         raise HTTPException(status_code=404, detail="User not found")
 
     user.is_verified = True
+
+    existing_workspace = db.query(Workspace).filter(
+        Workspace.user_id == user.id
+    )
+
+    if not existing_workspace:
+        workspace = Workspace(
+            name="Default Workspace",
+            user_id = user.id
+        )
+        db.add(workspace)
 
     db.delete(record)
     db.commit()
